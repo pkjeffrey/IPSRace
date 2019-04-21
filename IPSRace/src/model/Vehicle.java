@@ -33,8 +33,16 @@ public class Vehicle {
 		_energy++;
 	}
 	
+	public VehicleAddOn getAddOn() {
+		return _addOn;
+	}
+	
 	public void setAddOn(VehicleAddOn addOn) {
 		_addOn = addOn;
+	}
+	
+	public VehicleType getType() {
+		return _type;
 	}
 	
 	public void setType(VehicleType type) {
@@ -75,8 +83,10 @@ public class Vehicle {
 		} else
 			items = new ArrayList<>();
 		
-		if (_position.getPickUp() != null)
+		if (_position.getPickUp() != null) {
 			items.add(_position.getPickUp());
+			_position.setPickUp(null);
+		}
 		
 		return items;
 	}

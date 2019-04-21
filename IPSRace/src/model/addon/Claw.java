@@ -27,6 +27,7 @@ public class Claw extends VehicleAddOn {
 				PickUpable pickUp = check.getPickUp();
 				if (pickUp != null) {
 					items.add(pickUp);
+					check.setPickUp(null);
 					used = true;
 				}
 			}

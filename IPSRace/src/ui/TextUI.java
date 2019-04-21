@@ -7,9 +7,14 @@ import java.util.Random;
 
 import game.Controller;
 import model.Player;
+import model.addon.Gun;
+import model.addon.Nitrous;
 import model.addon.VehicleAddOn;
 import model.track.Cell;
+import model.track.Terrain;
 import model.track.Track;
+import model.vehicle.Amphibious;
+import model.vehicle.FourWheelDrive;
 import model.vehicle.VehicleType;
 
 public class TextUI implements UI {
@@ -21,6 +26,22 @@ public class TextUI implements UI {
 	public TextUI() {
 		_random = new Random(System.currentTimeMillis());
 		_track = new Track(5, 20);
+		_track.getCell(2, 3).setTerrain(Terrain.GRAVEL);
+		_track.getCell(4, 3).setTerrain(Terrain.BOULDER);
+		_track.getCell(7, 0).setTerrain(Terrain.RIVER);
+		_track.getCell(7, 1).setTerrain(Terrain.RIVER);
+		_track.getCell(7, 2).setTerrain(Terrain.RIVER);
+		_track.getCell(7, 3).setTerrain(Terrain.BRIDGE);
+		_track.getCell(7, 4).setTerrain(Terrain.RIVER);
+		_track.getCell(10, 3).setTerrain(Terrain.BOULDER);
+		_track.getCell(10, 4).setTerrain(Terrain.BOULDER);
+		_track.getCell(13, 2).setTerrain(Terrain.GRAVEL);
+		_track.getCell(14, 1).setTerrain(Terrain.BOULDER);
+		_track.getCell(14, 2).setTerrain(Terrain.BOULDER);
+		_track.getCell(3, 1).setPickUp(new FourWheelDrive());
+		_track.getCell(3, 2).setPickUp(new Amphibious());
+		_track.getCell(5, 4).setPickUp(new Gun());
+		_track.getCell(9, 1).setPickUp(new Nitrous());
 		_players = new ArrayList<>();
 		_players.add(new Player("Ian", Color.BLUE, _track.getCell(0, 1)));
 		_players.add(new Player("Peter", Color.RED, _track.getCell(0, 2)));
@@ -56,7 +77,10 @@ public class TextUI implements UI {
 
 	@Override
 	public String promptPlayerForMove(Player player) {
-		System.out.print(String.format("%1$s's turn. Which direction? <F|B L|R> ", player.getName()));
+		String vehicle = player.getVehicle().getType().getType().getDescription();
+		if (player.getVehicle().getAddOn() != null)
+			vehicle += " (with " + player.getVehicle().getAddOn().getType().getDescription() + ")";
+		System.out.print(String.format("%1$s's turn. Driving %2$s. Which direction? <F|B L|R> ", player.getName(), vehicle));
 		return waitInput();
 	}
 
@@ -85,11 +109,12 @@ public class TextUI implements UI {
 	@Override
 	public void promptPlayerWins(Player player) {
 		System.out.print(String.format("%1$s has won the race! Congratuations! <Enter>", player.getName()));
+		waitInput();
 	}
 
 	@Override
 	public void redraw() {
-		for (int i = 0; i < _track.getLength(); i++)
+		for (int i = 0; i < _track.getLength() * 3; i++)
 			System.out.print("-");
 		System.out.println();
 		
@@ -103,15 +128,15 @@ public class TextUI implements UI {
 						break;
 					}
 				if (playerCell != null)
-					System.out.print(playerCell.getName().charAt(0));
+					System.out.print("[" + playerCell.getName().charAt(0) + "]");
 				else {
 					if (cell.getPickUp() != null) {
 						if (cell.getPickUp() instanceof VehicleType) {
 							VehicleType t = (VehicleType) cell.getPickUp();
-							System.out.print(t.getType().getDescription().toLowerCase().charAt(0));
+							System.out.print(t.getType().getDescription().substring(0, 3));
 						} else {
 							VehicleAddOn a = (VehicleAddOn) cell.getPickUp();
-							System.out.print(a.getType().getDescription().toLowerCase().charAt(0));
+							System.out.print(a.getType().getDescription().substring(0, 3));
 						}
 					} else {
 						char c;
@@ -129,14 +154,14 @@ public class TextUI implements UI {
 							c = ' ';
 							break;
 						}
-						System.out.print(c);
+						System.out.print("" + c + c + c);
 					}
 				}
 			}
 			System.out.println();
 		}
 		
-		for (int i = 0; i < _track.getLength(); i++)
+		for (int i = 0; i < _track.getLength() * 3; i++)
 			System.out.print("-");
 		System.out.println();
 	}
