@@ -10,6 +10,9 @@ public class Track {
 	
 	public Track(int width, int length) {
 		_cells = new Cell[length][width];
+		for (int step = 0; step < length; step++)
+			for (int lane = 0; lane < width; lane++)
+				_cells[step][lane] = new Cell(step, lane, Terrain.DIRT, this);
 	}
 	
 	public int getLength() {
