@@ -1,14 +1,25 @@
 package model.track;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import model.Direction;
+import model.addon.AddOn;
+import model.addon.Claw;
+import model.addon.Gun;
+import model.addon.Nitrous;
+import model.vehicle.Amphibious;
+import model.vehicle.Buggy;
+import model.vehicle.FourWheelDrive;
+import model.vehicle.Type;
 
 public class Track {	
 	private Cell[][] _cells;
 	
-	public Track(int width, int length) {
+	protected Track(int width, int length) {
 		_cells = new Cell[length][width];
 		for (int step = 0; step < length; step++)
 			for (int lane = 0; lane < width; lane++)
@@ -57,5 +68,65 @@ public class Track {
 		}
 		
 		return cells;
+	}
+	
+	public static Track build(String trackFile) throws IOException {
+		Track track = null;
+		String line;
+		String[] parts;
+		BufferedReader r = null;
+		
+		r = new BufferedReader(new FileReader(trackFile));
+		
+		line = r.readLine();
+		parts = line.split(",");
+		track = new Track(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+		
+		while ((line = r.readLine()) != null) {
+			if ("".equals(line))
+				break;
+			parts = line.split(",");
+			Terrain terrain = Terrain.valueOf(parts[2]);
+			track.getCell(Integer.parseInt(parts[0]), Integer.parseInt(parts[1])).setTerrain(terrain);
+		}
+		
+		while ((line = r.readLine()) != null) {
+			if ("".equals(line))
+				break;
+			parts = line.split(",");
+			Type type = Type.valueOf(parts[2]);
+			switch (type) {
+			case BUGGY:
+				track.getCell(Integer.parseInt(parts[0]), Integer.parseInt(parts[1])).setPickUp(new Buggy());
+				break;
+			case FOUR_WHEEL_DRIVE:
+				track.getCell(Integer.parseInt(parts[0]), Integer.parseInt(parts[1])).setPickUp(new FourWheelDrive());
+				break;
+			case AMPHIBIOUS:
+				track.getCell(Integer.parseInt(parts[0]), Integer.parseInt(parts[1])).setPickUp(new Amphibious());
+				break;
+			}
+		}
+		
+		while ((line = r.readLine()) != null) {
+			parts = line.split(",");
+			AddOn addOn = AddOn.valueOf(parts[2]);
+			switch (addOn) {
+			case CLAW:
+				track.getCell(Integer.parseInt(parts[0]), Integer.parseInt(parts[1])).setPickUp(new Claw());
+				break;
+			case GUN:
+				track.getCell(Integer.parseInt(parts[0]), Integer.parseInt(parts[1])).setPickUp(new Gun());
+				break;
+			case NITROUS:
+				track.getCell(Integer.parseInt(parts[0]), Integer.parseInt(parts[1])).setPickUp(new Nitrous());
+				break;
+			}
+		}
+		
+		if (r != null)
+			r.close();
+		
+		return track;
 	}
 }

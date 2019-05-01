@@ -14,5 +14,6 @@ public interface UI {
 	public VehicleType promptPlayerForVehicleTypePickUp(Player player, List<VehicleType> types);
 	public VehicleAddOn promptPlayerForVehicleAddOnPickUp(Player player, List<VehicleAddOn> addOns);
 	public void promptPlayerWins(Player player);
+	public void play();
 	public void redraw();
 }

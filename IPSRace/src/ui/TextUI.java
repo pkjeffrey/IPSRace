@@ -1,54 +1,33 @@
 package ui;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import game.Controller;
 import model.Player;
-import model.addon.Gun;
-import model.addon.Nitrous;
 import model.addon.VehicleAddOn;
 import model.track.Cell;
-import model.track.Terrain;
 import model.track.Track;
-import model.vehicle.Amphibious;
-import model.vehicle.FourWheelDrive;
 import model.vehicle.VehicleType;
 
 public class TextUI implements UI {
+	private static final Color[] COLORS = {Color.RED, Color.YELLOW, Color.GREEN, Color.BLUE, Color.MAGENTA};
+	
 	private Random _random;
 	private Track _track;
 	private List<Player> _players;
 	private Controller _controller;
 	
-	public TextUI() {
+	public TextUI(String trackFile, String[] players) throws IOException {
 		_random = new Random(System.currentTimeMillis());
-		_track = new Track(5, 20);
-		_track.getCell(2, 3).setTerrain(Terrain.GRAVEL);
-		_track.getCell(4, 3).setTerrain(Terrain.BOULDER);
-		_track.getCell(7, 0).setTerrain(Terrain.RIVER);
-		_track.getCell(7, 1).setTerrain(Terrain.RIVER);
-		_track.getCell(7, 2).setTerrain(Terrain.RIVER);
-		_track.getCell(7, 3).setTerrain(Terrain.BRIDGE);
-		_track.getCell(7, 4).setTerrain(Terrain.RIVER);
-		_track.getCell(10, 3).setTerrain(Terrain.BOULDER);
-		_track.getCell(10, 4).setTerrain(Terrain.BOULDER);
-		_track.getCell(13, 2).setTerrain(Terrain.GRAVEL);
-		_track.getCell(14, 1).setTerrain(Terrain.BOULDER);
-		_track.getCell(14, 2).setTerrain(Terrain.BOULDER);
-		_track.getCell(3, 1).setPickUp(new FourWheelDrive());
-		_track.getCell(3, 2).setPickUp(new Amphibious());
-		_track.getCell(5, 4).setPickUp(new Gun());
-		_track.getCell(9, 1).setPickUp(new Nitrous());
+		_track = Track.build(trackFile);
 		_players = new ArrayList<>();
-		_players.add(new Player("Ian", Color.BLUE, _track.getCell(0, 1)));
-		_players.add(new Player("Peter", Color.RED, _track.getCell(0, 2)));
-		_players.add(new Player("Shwetha", Color.GREEN, _track.getCell(0, 3)));
-		_controller = new Controller(this, _players, _track);
-		_controller.init();
-		_controller.play();
+		int lane = players.length < 4 ? 1 : 0;
+		for (int i = 0; i < players.length; i++)
+			_players.add(new Player(players[i], COLORS[i], _track.getCell(0, lane++)));
 	}
 
 	@Override
@@ -110,6 +89,13 @@ public class TextUI implements UI {
 	public void promptPlayerWins(Player player) {
 		System.out.print(String.format("%1$s has won the race! Congratuations! <Enter>", player.getName()));
 		waitInput();
+	}
+
+	@Override
+	public void play() {
+		_controller = new Controller(this, _players, _track);
+		_controller.init();
+		_controller.play();
 	}
 
 	@Override
